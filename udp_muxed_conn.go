@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"io"
 	"net"
+	"runtime/debug"
 	"sync"
 	"time"
 
@@ -111,6 +112,7 @@ func (c *udpMuxedConn) CloseChannel() <-chan struct{} {
 }
 
 func (c *udpMuxedConn) Close() error {
+	c.params.Logger.Errorf("close called, %s", debug.Stack())
 	var err error
 	c.closeOnce.Do(func() {
 		err = c.buffer.Close()
