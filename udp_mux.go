@@ -180,6 +180,7 @@ func (m *UDPMuxDefault) registerConnForAddress(conn *udpMuxedConn, addr string) 
 	m.addressMapMu.Lock()
 	defer m.addressMapMu.Unlock()
 
+	m.params.Logger.Debugf("registered %s for %s", addr, conn.params.Key)
 	existing, ok := m.addressMap[addr]
 	if ok {
 		existing.removeAddress(addr)
@@ -251,12 +252,14 @@ func (m *UDPMuxDefault) connWorker() {
 
 			ufrag := strings.Split(string(attr), ":")[0]
 
+			m.params.Logger.Debugf("found STUN address: %s", addr.String())
 			m.mu.Lock()
 			destinationConn = m.conns[ufrag]
 			m.mu.Unlock()
 		}
 
 		if destinationConn == nil {
+			m.params.Logger.Debugf("dropping packet from %s, addr: %s", udpAddr.String(), addr.String())
 			continue
 		}
 
