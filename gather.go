@@ -140,6 +140,7 @@ func (a *Agent) gatherCandidatesLocal(ctx context.Context, networkTypes []Networ
 		return
 	}
 
+	seenAddresses := make(map[string]bool)
 	for _, ip := range localIPs {
 		mappedIP := ip
 		if a.mDNSMode != MulticastDNSModeQueryAndGather && a.extIPMapper != nil && a.extIPMapper.candidateType == CandidateTypeHost {
@@ -159,8 +160,15 @@ func (a *Agent) gatherCandidatesLocal(ctx context.Context, networkTypes []Networ
 			var port int
 			var conn net.PacketConn
 			var err error
-
 			var tcpType TCPType
+
+			var addressKey = network + address
+			// don't allow gathering duplicate candidates for the same IP
+			if seenAddresses[addressKey] {
+				continue
+			}
+			seenAddresses[addressKey] = true
+
 			switch network {
 			case tcp:
 				// Handle ICE TCP passive mode
