@@ -74,6 +74,7 @@ func (c *udpMuxedConn) ReadFrom(b []byte) (n int, raddr net.Addr, err error) {
 }
 
 func (c *udpMuxedConn) WriteTo(buf []byte, raddr net.Addr) (n int, err error) {
+	c.params.Logger.Debugf("writing to %s", raddr.String())
 	if c.isClosed() {
 		return 0, io.ErrClosedPipe
 	}
