@@ -178,6 +178,8 @@ func (a *Agent) gatherCandidatesLocal(ctx context.Context, networkTypes []Networ
 				// accessible from the current interface.
 			case udp:
 				if a.udpMux != nil {
+					mux := a.udpMux.(*UDPMuxDefault)
+					mux.params.Logger.Debugf("creating muxed conn for %s, %s, %s", network, a.localUfrag, address)
 					conn, err = a.udpMux.GetConn(a.localUfrag)
 					if err != nil {
 						a.log.Warnf("could not get udp muxed connection: %v\n", err)
