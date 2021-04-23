@@ -76,14 +76,17 @@ func (c *udpMuxedConn) ReadFrom(b []byte) (n int, raddr net.Addr, err error) {
 func (c *udpMuxedConn) WriteTo(buf []byte, raddr net.Addr) (n int, err error) {
 	c.params.Logger.Debugf("writing to %s", raddr.String())
 	if c.isClosed() {
+		c.params.Logger.Debugf("connection closed")
 		return 0, io.ErrClosedPipe
 	}
 	// each time we write to a new address, we'll register it with the mux
 	addr := raddr.String()
 	if !c.containsAddress(addr) {
+		c.params.Logger.Debugf("adding address")
 		c.addAddress(addr)
 	}
 
+	c.params.Logger.Debugf("actually writing %s", raddr.String())
 	return c.params.Mux.writeTo(buf, raddr)
 }
 
